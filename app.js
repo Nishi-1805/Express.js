@@ -3,23 +3,22 @@ const bodyParser = require('body-parser');
 
 const app = express();
 
-app.use(bodyParser.urlencoded({extended: false}));
+const adminRoutes = require('./routes/admin');
+const shopRoutes = require('./routes/shop');
 
-app.use('/add-product',(req, res, next)=>{
-    res.send(`<form action="/product" method="POST">
-        <input type="text" name="title" placeholder="Product Title">
-        <input type="text" name="size" placeholder="Product size">
-        <button type="submit">Add Product</button>
-        </form>`);
+app.use(bodyParser.urlencoded({ extended: false }));
+
+// Use '/admin' prefix for admin routes
+app.use('/admin', adminRoutes);
+
+// Use '/shop' prefix for shop routes
+app.use('/shop', shopRoutes);
+
+// 404 Page Not Found Middleware
+app.use((req, res, next) => {
+    res.status(404).send('<h1>Page Not Found</h1>');
 });
 
-app.post('/product',(req,res,next)=>{
-    console.log(req.body);
-    res.redirect('/');
-})
-
-app.use('/',(req, res, next)=>{
-    res.send('<h1>Hello from Express!</h1>');
+app.listen(3000, () => {
+    console.log('Server is running on port 3000');
 });
-
-app.listen(3000);
