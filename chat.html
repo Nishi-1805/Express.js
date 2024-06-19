@@ -3,52 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat Room</title>
+    <title>Chat App</title>
 </head>
 <body>
-    <h1>Chat Room</h1>
-    <form action="/send" method="POST" onsubmit="addUsernametoChat()">
-        <!--Hidden input to store the usrrname-->
-        <input type="hidden" id="username" name="username">
+    <h1>Welcome to the Chat App</h1>
+    <form id="messageForm">
         <label for="message">Message:</label>
         <input type="text" id="message" name="message" required>
         <button type="submit">Send</button>
     </form>
-    <h2>Messages</h2>
-    <ul id="messages"></ul>
+
+    <div id="messageList"></div>
+
     <script>
-        // To ensure username is set in the hidden input and fetch messages
-        document.addEventListener("DOMContentLoaded", ()=>{
-    const username = localStorage.getItem('username');
-    if(!username){
-        window.location.href = '/login';
-    }
-    else{
-        username = document.getElementById('username').value;
-        fetchMessages();
-    }
-        });
-    //Setting username in hidden input before form submission 
-    function addUsernametoChat(){
-        const username = localStorage.getItem('username');
-        username = document.getElementById('username').value;
-    }
-    // Fetch and display users
-    function fetchMessages(){
-        fetch('/messages')
-        .then(response=>response.json())
-        .then(messages=>{
-            const messagesList = document.getElementById('messages');
-            messagesList.innerHTML = '';
-            messages.forEach(msg => {
-                const msgList = document.createElement('li');
-                msgList.textContent = `${msg.username} : ${msg.message}`;
-                messagesList.appendChild(msgList);
+        document.getElementById('messageForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const message = document.getElementById('message').value;
+            const username = localStorage.getItem('username');
+            const data = { username, message };
+
+            fetch('/send-message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log('Message sent successfully:', result);
+            })
+            .catch(error => {
+                console.error('Error sending message:', error);
             });
-        })
-    }
-    // fetch new message every second
-    setInterval(fetchMessages, 1000);
+            document.getElementById('message').value = ''; // Clear input field
+        });
+        function displayMessages(messages) {
+            const messageList = document.getElementById('messageList');
+            messageList.innerHTML = '';
+
+            messages.forEach(message => {
+                const messageElement = document.createElement('div');
+                messageElement.textContent = `${message.username}: ${message.message}`;
+                messageList.appendChild(messageElement);
+            });
+        }
+        fetch('/messages')
+            .then(response => response.json())
+            .then(messages => {
+                displayMessages(messages);
+            })
+            .catch(error => {
+                console.error('Error fetching messages:', error);
+            });
     </script>
 </body>
 </html>
