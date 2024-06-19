@@ -1,0 +1,50 @@
+[
+  {
+    "username": "nishi",
+    "message": "hello"
+  },
+  {
+    "username": "nishi",
+    "message": "i will call you"
+  },
+  {
+    "username": "mansi",
+    "message": "see you"
+  },
+  {
+    "username": "nishi",
+    "message": "my name is nishi"
+  },
+  {
+    "username": "mansi",
+    "message": "nice meeting you"
+  },
+  {
+    "username": "nishi",
+    "message": "bye"
+  },
+  {
+    "username": "sakshi",
+    "message": "hii"
+  },
+  {
+    "username": "\"akshat\"",
+    "message": "hello everyone"
+  },
+  {
+    "username": "\"ranjana\"",
+    "message": "what's up"
+  },
+  {
+    "username": null,
+    "message": "next time"
+  },
+  {
+    "username": "\"dad\"",
+    "message": "stop"
+  },
+  {
+    "username": "mom",
+    "message": "yup"
+  }
+]
