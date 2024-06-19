@@ -8,15 +8,15 @@
 <body>
     <h1>Login</h1>
     <form action="/login" method="POST" onsubmit="saveUsername()">
-    <label for="username">Username:</label>
-    <input type="text" name="username" id="username" required>
-    <button type="submit">Login</button>
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+        <button type="submit">Login</button>
     </form>
-<script>
-    function saveUsername(){
-        const username = document.getElementById("username").value;
-        localStorage.setItem('username', username);
-    }
-</script>
+    <script>
+        function saveUsername(){
+            const username = document.getElementById('username').value;
+            localStorage.setItem('username', username);
+        }
+    </script>
 </body>
 </html>

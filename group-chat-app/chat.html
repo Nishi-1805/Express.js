@@ -8,34 +8,30 @@
 <body>
     <h1>Chat Room</h1>
     <form action="/send" method="POST" onsubmit="addUsernametoChat()">
-        <!--Hidden input to store the usrrname-->
-        <input type="hidden" id="username" name="username">
+        <input type="hidden" name="username" id="username">
         <label for="message">Message:</label>
-        <input type="text" id="message" name="message" required>
+        <input type="text" name="message" id="message" required>
         <button type="submit">Send</button>
     </form>
     <h2>Messages</h2>
     <ul id="messages"></ul>
     <script>
-        // To ensure username is set in the hidden input and fetch messages
         document.addEventListener("DOMContentLoaded", ()=>{
-    const username = localStorage.getItem('username');
-    if(!username){
-        window.location.href = '/login';
-    }
-    else{
-        username = document.getElementById('username').value;
-        fetchMessages();
-    }
+            const username = localStorage.getItem('username');
+            if(!username){
+                window.location.href = '/login';
+            }
+            else{
+             username = document.getElementById('username').value;
+             fetchMessages();
+            };
         });
-    //Setting username in hidden input before form submission 
-    function addUsernametoChat(){
-        const username = localStorage.getItem('username');
-        username = document.getElementById('username').value;
-    }
-    // Fetch and display users
-    function fetchMessages(){
-        fetch('/messages')
+        function addUsernametoChat() {
+            const username = localStorage.getItem('username');
+            username = document.getElementById('username').value;
+        }
+        function fetchMessages(){
+            fetch('/messages')
         .then(response=>response.json())
         .then(messages=>{
             const messagesList = document.getElementById('messages');

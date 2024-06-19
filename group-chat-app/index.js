@@ -4,52 +4,62 @@ const fs = require('fs');
 const path = require('path');
 
 const app = express();
+const PORT = 3000;
+const messagesFilePath = path.join(__dirname, 'messages.json');
 
-app.use(bodyParser.urlencoded({extended: true}));
+// Middleware to parse request bodies
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
-app.get('/login', (req, res)=>{
-    res.sendFile(path.join(__dirname, 'login.html'));
-});
+// Serve static files (HTML, CSS, JS)
+app.use(express.static(__dirname));
 
-app.post('/login', (req, res)=>{
-    const {username} = req.body;
+// Route to handle login form submission
+app.post('/login', (req, res) => {
+    // Simply redirect to the chat page after login
     res.redirect('/');
-})
-
-app.get('/', (req, res)=>{
-    const username = localStorage.getItem('username');
-    if(!username){
-        res.redirect('/login');
-    }
-    else{
-        res.sendFile(path.join(__dirname, 'chat.html'));
-    }; 
 });
 
-app.post('/send', (req, res)=>{
-    const {username, message} = req.body;
-    const newMessage = {username, message};
+// Route to handle chat form submission
+app.post('/send', (req, res) => {
+    const { username, message } = req.body;
 
-    fs.readFile('message.json', (err, data)=>{
-        let messages = [];
-        if(!err){
-            messages = JSON.parse(data);
+    // Read existing messages
+    fs.readFile(messagesFilePath, 'utf8', (err, data) => {
+        if (err) {
+            return res.status(500).send('Error reading messages file.');
         }
-        messages.push(newMessage);
-        fs.writeFile('message.json', JSON.stringify(messages), (err)=>{
-            if(err) throw err;
-        })
-    })
-    res.redirect('/');
-})
-app.get('/messages', (req, res)=>{
-    fs.readFile('message.json', (err, data)=>{
-        if (err){
-            return res.join([]);
-        };
-        res.join(JSON.parse(data));
+
+        const messages = data ? JSON.parse(data) : [];
+        messages.push({ username, message });
+
+        // Save updated messages to file
+        fs.writeFile(messagesFilePath, JSON.stringify(messages), (err) => {
+            if (err) {
+                return res.status(500).send('Error saving message.');
+            }
+            res.redirect('/');
+        });
     });
 });
-app.listen(4000,()=>{
-    console.log('Server is running on localhost:4000');
-})
+
+// Route to get messages
+app.get('/messages', (req, res) => {
+    fs.readFile(messagesFilePath, 'utf8', (err, data) => {
+        if (err) {
+            return res.status(500).send('Error reading messages file.');
+        }
+        const messages = data ? JSON.parse(data) : [];
+        res.json(messages);
+    });
+});
+
+// 404 handler
+app.use((req, res) => {
+    res.status(404).send('<h1>Page Not Found</h1>');
+});
+
+// Start the server
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+});
