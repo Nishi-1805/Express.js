@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 
@@ -7,18 +8,17 @@ const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.static(path.join(__dirname, 'public')))
 
-// Use '/admin' prefix for admin routes
 app.use('/admin', adminRoutes);
 
-// Use '/shop' prefix for shop routes
-app.use('/shop', shopRoutes);
+app.use(shopRoutes);
 
-// 404 Page Not Found Middleware
 app.use((req, res, next) => {
-    res.status(404).send('<h1>Page Not Found</h1>');
+    res.status(404).sendFile(path.join(__dirname, 'views', '404.html'));
 });
 
-app.listen(3000, () => {
-    console.log('Server is running on port 3000');
+app.listen(7000, () => {
+    console.log('Server is running on port 7000');
 });
+
