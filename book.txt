@@ -1,0 +1,42 @@
+Name: Nishi
+Email: nishi@gmail.com
+Phone: 14373564
+Date: 2024-06-21
+Time: 16:04
+
+Name: Mansi
+Email: mansi@gmail.com
+Phone: 65386765
+Date: 2024-06-27
+Time: 15:09
+
+Name: Sakshi
+Email: sakshi@gmail.com
+Phone: 876467656
+Date: 2024-07-06
+Time: 19:13
+
+Name: Anuj
+Email: anuj@gmail.com
+Phone: 65437843546
+Date: 2024-07-01
+Time: 18:15
+
+Name: Anuj
+Email: anuj@gmail.com
+Phone: 65437843546
+Date: 2024-07-01
+Time: 18:15
+
+Name: Ranjana
+Email: ranjana@gmail.com
+Phone: 7643678765
+Date: 2024-07-04
+Time: 20:18
+
+Name: Nishi
+Email: nishi@gmail.com
+Phone: 14373564
+Date: 2024-06-28
+Time: 18:20
+
