@@ -1,14 +1,12 @@
 const path = require('path');
 const express = require('express');
 const router = express.Router();
+const productsController = require('../controllers/products');
 
-// Example route for shop page
-router.get('/', (req, res, next) => {
-    res.sendFile(path.join(__dirname, '..', 'views', 'shop.html'));
-});
-
-router.get('/contactus', (req, res, next) => {
-    res.sendFile(path.join(__dirname, '..', 'views', 'contact-us.html'));
-});
+router.get('/', productsController.getHome);
+router.get('/courses', productsController.redirectHome);
+router.get('/hire', productsController.redirectHome);
+router.get('/pricing', productsController.redirectHome);
+router.get('/contact-us', productsController.getContactUs);
 
 module.exports = router;
