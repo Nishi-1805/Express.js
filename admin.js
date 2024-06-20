@@ -1,18 +1,27 @@
 const path = require('path');
-
 const express = require('express');
-
-const rootDir = require('../util/path');
-
 const router = express.Router();
+const fs = require('fs');
 
-router.get('/add-product',(req, res, next)=>{
-    res.sendFile(path.join(rootDir, 'views', 'add-product.html'));
-});
+router.post('/book', (req, res, next) => {
+    const { name, email, phone, date, time } = req.body;
+    const data = `Name: ${name}\nEmail: ${email}\nPhone: ${phone}\nDate: ${date}\nTime: ${time}\n\n`;
 
-router.post('/add-product',(req, res, next)=>{
-    console.log(req.body);
-    res.redirect('/');
+    const filePath = path.join(__dirname, '../book.txt');
+
+    fs.appendFile(filePath, data, (err) => {
+        if (err) {
+            console.error('Error writing to file:', err);
+            res.status(500).send('Failed to save data');
+        } else {
+            console.log('Data saved successfully');
+            //res.send('Form Submitted Successfully');
+            setTimeout(()=>{
+                res.redirect('/');
+            },1500);
+        }
+    });
 });
 
 module.exports = router;
+
