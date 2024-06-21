@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart</title>
+    <link rel="stylesheet" href="/css/main.css">
+    
+</head>
+<body>
+    <header class="main-header">
+        <nav class="main-header__nav">
+            <ul class="main-header__item-list">
+                <li class="main-header__item"><a href="/">Home</a></li>
+                <li class="main-header__item"><a href="/courses">Courses</a></li>
+                <li class="main-header__item"><a href="/hire">Hire with Us</a></li>
+                <li class="main-header__item"><a href="/pricing">Pricing</a></li>
+                <li class="main-header__item"><a href="/contact-us">Contact Us</a></li>
+                <li class="main-header__item"><a href="/product">Products</a></li>
+                <li class="main-header__item"><a href="/cart">Cart</a></li>
+                
+              
+            </ul>
+        </nav>
+    </header>
+    <main class="centered">
+        <h1>Your Cart</h1>
+        <ul class="cart-list" id="cart-list">
+            <!-- Cart items will be populated here by JavaScript -->
+        </ul>
+        <p id="total-price">Total Price: $0</p>
+    </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('/cart-data')
+                .then(response => response.json())
+                .then(cart => {
+                    const cartList = document.getElementById('cart-list');
+                    const totalPrice = document.getElementById('total-price');
+
+                    cart.products.forEach(product => {
+                        const li = document.createElement('li');
+                        li.className = 'cart-item';
+                        li.innerHTML = `
+                            <h2>${product.title}</h2>
+                            <p>Quantity: ${product.qty}</p>
+                            <p>Price: $${product.price}</p>
+                            <form action="/remove-from-cart" method="POST">
+                                <input type="hidden" name="productId" value="${product.id}">
+                                <button type="submit">Remove from Cart</button>
+                            </form>
+                        `;
+                        cartList.appendChild(li);
+                    });
+
+                    totalPrice.textContent = `Total Price: $${cart.totalPrice}`;
+                });
+        });
+    </script>
+</body>
+</html>

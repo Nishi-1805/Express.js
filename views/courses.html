@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Courses</title>
+    <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+    <header class="main-header">
+        <nav class="main-header__nav">
+            <ul class="main-header__item-list">
+                <li class="main-header__item"><a href="/">Home</a></li>
+                <li class="main-header__item"><a class="active" href="/courses">Courses</a></li>
+                <li class="main-header__item"><a href="/hire">Hire with Us</a></li>
+                <li class="main-header__item"><a href="/pricing">Pricing</a></li>
+                <li class="main-header__item"><a href="/contact-us">Contact Us</a></li>
+                <li class="main-header__item"><a href="/product">Products</a></li>
+                <li class="main-header__item"><a href="/cart">Cart</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h1>Courses</h1>
+        <p><strong>Welcome to our courses page. Explore our available courses below:</strong></p>
+        <ul id="product-list"></ul>
+    </main>
+    <script>
+        fetch('/products')
+            .then(response => response.json())
+            .then(products => {
+                const productList = document.getElementById('product-list');
+                products.forEach(product => {
+                    const li = document.createElement('li');
+                    const a = document.createElement('a');
+                    a.href = `/products/${product.id}`;
+                    a.textContent = product.name;
+                    li.appendChild(a);
+                    productList.appendChild(li);
+                });
+            })
+            .catch(error => console.error('Error fetching products:', error));
+    </script>
+</body>
+</html>
