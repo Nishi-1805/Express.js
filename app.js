@@ -17,6 +17,18 @@ app.use('/admin', adminRoutes);
 app.use('/' ,shopRoutes);
 app.use(successRoutes);
 
+const cartFilePath = path.join(__dirname, 'data', 'cart.json');
+const initialCartData = { products: [], totalPrice: 0 };
+
+// Check if cart.json exists, if not, create it with initial data
+if (!fs.existsSync(cartFilePath)) {
+    fs.writeFileSync(cartFilePath, JSON.stringify(initialCartData), 'utf-8', (err) => {
+        if (err) {
+            console.error('Error creating cart.json file:', err);
+        }
+    });
+}
+
 const dataDir = path.join(__dirname, 'data');
 const dataFilePath = path.join(dataDir, 'products.json');
 

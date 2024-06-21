@@ -1,5 +1,6 @@
 const path = require('path');
-const productModel = require('../models/product');
+const Product = require('../models/product');
+const Cart = require('../models/cart');
 
 // Render the home page
 exports.getHome = (req, res, next) => {
@@ -16,12 +17,63 @@ exports.getContactUs = (req, res, next) => {
     res.sendFile(path.join(__dirname, '../views', 'contact-us.html'));
 };
 
-// Handle adding a product (POST)
+exports.getAllProducts = (req, res, next) => {
+    Product.fetchProducts(products => {
+        res.sendFile(path.join(__dirname, '../views', 'products.html'));
+    });
+};
 
+exports.getProductDetail = (req, res, next) => {
+    const productId = req.params.productId;
+    Product.findProductById(productId, product => {
+        if (product) {
+            res.json(product);  // For now, just send the product details in response
+        } else {
+            res.status(404).send('Product not found');
+        }
+    });
+};
+
+exports.postAddToCart = (req, res, next) => {
+    const productId = req.body.productId; // Assuming productId is sent via form or AJAX
+    Product.findById(productId, product => {
+        if (!product) {
+            return res.status(404).sendFile(path.join(__dirname, '../views', '404.html'));
+        }
+        Cart.addProduct(productId, product.price, () => {
+            res.redirect('/cart');
+        });
+    });
+};
+
+// Remove product from cart
+exports.postRemoveFromCart = (req, res, next) => {
+    const productId = req.body.productId; // Assuming productId is sent via form or AJAX
+    Product.findById(productId, product => {
+        if (!product) {
+            return res.status(404).sendFile(path.join(__dirname, '../views', '404.html'));
+        }
+        Cart.deleteProduct(productId, product.price, () => {
+            res.redirect('/cart');
+        });
+    });
+};
+
+// Display cart
+exports.getCart = (req, res, next) => {
+    Cart.getCart(cart => {
+        if (!cart) {
+            cart = { products: [], totalPrice: 0 };
+        }
+        res.sendFile(path.join(__dirname, '..', 'views', 'cart.html'));
+    });
+};
+
+// Handle adding a product (POST)
 exports.postAddProduct = (req, res, next) => {
     const { name, email, phone, date, time } = req.body;
     const product = { name, email, phone, date, time };
-productModel.saveProduct(product, (err) => {
+Product.saveProduct(product, (err) => {
     if (err) {
         console.error('Error saving product:', err);
         res.status(500).send('Error saving product');
@@ -41,14 +93,9 @@ exports.get404 = (req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, '..', 'views', '404.html'));
 };
 
-// Placeholder for adding a product (GET)
-//exports.getAddProduct = (req, res, next) => {
-  //  res.send('Add Product Page'); // Replace with actual implementation if necessary
-//};
-
 // Fetch all products and render courses page
 exports.getCourses = (req, res, next) => {
-    productModel.fetchProducts((products) => {
+    Product.fetchProducts((products) => {
         res.sendFile(path.join(__dirname, '../views', 'courses.html'));
     });
 };
@@ -56,7 +103,7 @@ exports.getCourses = (req, res, next) => {
 // Get product details by ID
 exports.getProductDetail = (req, res, next) => {
     const productId = req.params.productId;
-    productModel.findProductById(productId, (product) => {
+    Product.findProductById(productId, (product) => {
         if (product) {
             res.json(product);  // For now, just send the product details in response
         } else {
