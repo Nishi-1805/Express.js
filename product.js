@@ -1,39 +1,50 @@
 const path = require('path');
 const fs = require('fs');
 
-const filePath = path.join(__dirname, '../book.txt');
+const filePath = path.join(__dirname, '../data', 'products.json');
 
-// Function to fetch all products from the file
-const fetchProducts = () => {
-    return new Promise((resolve, reject) => {
-        fs.readFile(filePath, 'utf8', (err, data) => {
-            if (err) {
-                reject(err);
-            } else {
-                const products = data.split('\n\n').filter(product => product.trim() !== '');
-                resolve(products);
+const getProductsFromFile = (cb) => {
+    fs.readFile(filePath, 'utf-8', (err, fileContent) => {
+        if (err) {
+            cb([]);
+        } else {
+            try {
+                cb(JSON.parse(fileContent));
+            } catch (parseErr) {
+                cb([]);
             }
-        });
+        }
     });
 };
 
-// Function to save a new product to the file
-const saveProduct = (product) => {
-    return new Promise((resolve, reject) => {
-        fs.appendFile(filePath, product + '\n\n', (err) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve();
-            }
-        });
+const saveProductsToFile = (products, cb) => {
+    fs.writeFile(filePath, JSON.stringify(products, null, 2), (err) => {
+        if (cb) cb(err);
     });
 };
 
-module.exports = {
-    fetchProducts,
-    saveProduct
+
+let productIdCounter = 0;
+
+exports.saveProduct = (product, cb) => {
+    getProductsFromFile((products) => {
+        product.id = ++productIdCounter;
+        products.push(product);
+        saveProductsToFile(products, cb);
+    });
 };
+
+exports.fetchProducts = (cb) => {
+    getProductsFromFile(cb);
+};
+
+exports.findProductById = (id, cb) => {
+    getProductsFromFile((products) => {
+        const product = products.find(prod => prod.id === parseInt(id));
+        cb(product);
+    });
+};
+
 
 
 
