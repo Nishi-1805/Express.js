@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const successController = require('../controllers/success');
+const successController = require('../controllers/success1');
 
 router.get('/success', successController.getSuccess);
 

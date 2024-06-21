@@ -15,7 +15,11 @@ exports.getContactUs = (req, res, next) => {
 
 exports.postAddProduct = (req, res, next) => {
     const { name, email, phone, date, time } = req.body;
-    const product = `Name: ${name}, Email: ${email}, Phone: ${phone}, Date: ${date}, Time: ${time}`;
+    const product = `Name: ${name}, 
+    Email: ${email}, 
+    Phone: ${phone}, 
+    Date: ${date}, 
+    Time: ${time}`;
 
     productModel.saveProduct(product)
         .then(() => {
