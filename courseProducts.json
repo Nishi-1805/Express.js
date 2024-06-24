@@ -1,0 +1,17 @@
+[
+    {
+      "id": 1,
+      "name": "Web Development Course",
+      "description": "Learn web development with hands-on projects.",
+      "image": "https://cdn1.vectorstock.com/i/1000x1000/50/45/business-concept-background-web-development-vector-38735045.jpg",
+      "price": 199.99
+    },
+    {
+      "id": 2,
+      "name": "Data Science Course",
+      "description": "Master data science with real-world datasets.",
+      "image": "https://i.pinimg.com/originals/54/dd/2a/54dd2a6c17f894e233848e18eaa242d9.jpg",
+      "price": 299.99
+    }
+  ]
+  

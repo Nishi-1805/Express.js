@@ -7,8 +7,10 @@ const fs = require('fs');
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 const successRoutes = require('./routes/success');
+const cartRoutes = require('./routes/cart'); 
 
 const app = express();
+app.use(express.json());
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -16,6 +18,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/admin', adminRoutes);
 app.use('/' ,shopRoutes);
 app.use(successRoutes);
+app.use(cartRoutes); 
 
 const cartFilePath = path.join(__dirname, 'data', 'cart.json');
 const initialCartData = { products: [], totalPrice: 0 };
