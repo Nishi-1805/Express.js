@@ -18,33 +18,45 @@ const getProductsFromFile = (cb) => {
 };
 
 const saveProductsToFile = (products, cb) => {
-    fs.writeFile(filePath, JSON.stringify(products, null, 2), (err) => {
+    fs.writeFile(filePath, JSON.stringify(products, null, 1), (err) => {
         if (cb) cb(err);
     });
 };
 
-
-let productIdCounter = 0;
-
-exports.saveProduct = (product, cb) => {
-    getProductsFromFile((products) => {
-        product.id = ++productIdCounter;
-        products.push(product);
-        saveProductsToFile(products, cb);
-    });
+const getNewProductId = (products) => {
+    if (products.length === 0) {
+        return 1;
+    }
+    const maxId = products.reduce((max, product) => Math.max(max, product.id), 0);
+    return maxId + 1;
 };
 
-exports.fetchProducts = (cb) => {
-    getProductsFromFile(cb);
+module.exports = class CourseProduct {
+    constructor(id, name, image, price) {
+        this.id = id;
+        this.name = name;
+        this.image = image;
+        this.price = price;
+    }
+
+    static saveProduct(product, cb) {
+        getProductsFromFile((products) => {
+            product.id = getNewProductId(products);
+            products.push(product);
+            saveProductsToFile(products, cb);
+        });
+    }
+
+    static fetchProducts(cb) {
+        getProductsFromFile(cb);
+    }
+
+    static findProductById(id, cb) {
+        getProductsFromFile((products) => {
+            const product = products.find(prod => prod.id === parseInt(id));
+            cb(product);
+        });
+    }
 };
-
-exports.findProductById = (id, cb) => {
-    getProductsFromFile((products) => {
-        const product = products.find(prod => prod.id === parseInt(id));
-        cb(product);
-    });
-};
-
-
 
 

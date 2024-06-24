@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Cart</title>
     <link rel="stylesheet" href="/css/main.css">
-    
+
 </head>
+
 <body>
     <header class="main-header">
         <nav class="main-header__nav">
@@ -16,10 +18,10 @@
                 <li class="main-header__item"><a href="/hire">Hire with Us</a></li>
                 <li class="main-header__item"><a href="/pricing">Pricing</a></li>
                 <li class="main-header__item"><a href="/contact-us">Contact Us</a></li>
-                <li class="main-header__item"><a href="/product">Products</a></li>
+                <li class="main-header__item"><a href="/products">Products</a></li>
                 <li class="main-header__item"><a href="/cart">Cart</a></li>
-                
-              
+
+
             </ul>
         </nav>
     </header>
@@ -31,30 +33,81 @@
         <p id="total-price">Total Price: $0</p>
     </main>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            fetch('/cart-data')
-                .then(response => response.json())
-                .then(cart => {
-                    const cartList = document.getElementById('cart-list');
-                    const totalPrice = document.getElementById('total-price');
+       document.addEventListener('DOMContentLoaded', function () {
+            // Function to load cart data
+            function loadCart() {
+                fetch('/cart-data')
+                    .then(response => response.json())
+                    .then(cart => {
+                        const cartList = document.getElementById('cart-list');
+                        cartList.innerHTML = '';
+                        cart.products.forEach(product => {
+                            const cartItem = document.createElement('div');
+                            cartItem.classList.add('cart-item');
+                            cartItem.innerHTML = `
+                                <h2>${product.name}</h2>
+                                <img src="${product.image}" alt="${product.name}">
+                                <p>Quantity: ${product.qty}</p>
+                                <p>Price: $${product.price}</p>
+                                 <button class="edit-cart-btn" data-id="${product.id}" onclick="editCartItem(event)">Edit</button>
+                                <button onclick="removeFromCart('${product.id}', '${product.price}')">Delete</button>
+                            `;
+                            cartList.appendChild(cartItem);
+                        });
+                        document.getElementById('total-price').textContent = `Total Price: $${cart.totalPrice}`;
+                    })
+                    .catch(error => console.error('Error fetching cart data:', error));
+            }
 
-                    cart.products.forEach(product => {
-                        const li = document.createElement('li');
-                        li.className = 'cart-item';
-                        li.innerHTML = `
-                            <h2>${product.title}</h2>
-                            <p>Quantity: ${product.qty}</p>
-                            <p>Price: $${product.price}</p>
-                            <form action="/remove-from-cart" method="POST">
-                                <input type="hidden" name="productId" value="${product.id}">
-                                <button type="submit">Remove from Cart</button>
-                            </form>
-                        `;
-                        cartList.appendChild(li);
-                    });
-
-                    totalPrice.textContent = `Total Price: $${cart.totalPrice}`;
-                });
+            // Function to remove item from cart
+            window.removeFromCart = function (productId, productPrice) {
+                fetch('/remove-from-cart', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        productId: productId,
+                        productPrice: productPrice
+                    })
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            loadCart(); // Reload cart data to reflect changes
+                        } else {
+                            throw new Error('Failed to remove from cart');
+                        }
+                    })
+                    .catch(error => console.error('Error removing from cart:', error));
+            };
+ // Function to edit item quantity in cart
+ function editCartItem(event) {
+                const productId = event.target.getAttribute('data-id');
+                const newQty = prompt('Enter new quantity:');
+                
+                if (newQty !== null) {
+                    fetch('/edit-cart-item', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            productId: productId,
+                            newQty: parseInt(newQty)
+                        })
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            loadCart(); // Reload cart data to reflect changes
+                        } else {
+                            throw new Error('Failed to edit cart item');
+                        }
+                    })
+                    .catch(error => console.error('Error editing cart item:', error));
+                }
+            }
+            // Load cart data on page load
+            loadCart();
         });
     </script>
 </body>
