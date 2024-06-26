@@ -1,33 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Product</title>
     <link rel="stylesheet" href="/css/main.css">
-    <link rel="stylesheet" href="/css/product.css">  
 </head>
-
 <body>
     <header class="main-header">
         <nav class="main-header__nav">
             <ul class="main-header__item-list">
-                <li class="main-header__item"><a href="/">Shop</a></li>
-                <li class="main-header__item"><a class="active" href="/admin/add-product">Add Product</a></li>
+                <li class="main-header__item"><a href="/">Home</a></li>
+                <li class="main-header__item"><a href="/courses">Courses</a></li>
+                <li class="main-header__item"><a href="/hire">Hire with Us</a></li>
+                <li class="main-header__item"><a class="active" href="/add-product">Add Product</a></li>
+                <li class="main-header__item"><a href="/contact-us">Contact Us</a></li>
+                <li class="main-header__item"><a href="/products">Products</a></li>
+                <li class="main-header__item"><a href="/cart">Cart</a></li>
             </ul>
         </nav>
     </header>
-    <main>
-        <form class="product-form" action="/admin/add-product" method="POST">
-            <div class="form-control">
-                <label for="title">Title</label>
-                <input type="text" name="title">
-            </div>
+    <main class="centered">
+    <h1>Add New Product</h1>
+    <form id="add-product-form" action="/add-product" method="POST">
+        <label for="productId">Product ID:</label>
+        <input type="number" id="productId" name="id" required>
+        <br>
+        <label for="name">Product Name:</label>
+        <input type="text" id="name" name="title" required>
+        <br>
+        <label for="price">Price:</label>
+        <input type="number" id="price" name="price" required>
+        <br>
+        <label for="image">Image URL:</label>
+        <input type="text" id="image" name="imageUrl" required>
+        <br>
+        <label for="description">Description:</label>
+        <input type="text" id="description" name="description" required>
+        <br>
 
-            <button type="submit">Add Product</button>
-        </form>
+        <button type="submit">Add Product</button>
+    </form>
     </main>
-</body>
+    <script>
+        document.getElementById('add-product-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
 
+            const formData = new FormData(event.target);
+            const data = {
+                id: formData.get('id'),
+                title: formData.get('title'),
+                price: formData.get('price'),
+                imageUrl: formData.get('imageUrl'),
+                description: formData.get('description')
+            };
+
+            fetch('/add-product', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+            if (response.ok) {
+                return response.json(); // Parse response JSON
+            }
+            throw new Error('Failed to add product');
+        })
+        .then(data => {
+            // Assuming productList is the container where products are displayed
+            const productList = document.getElementById('product-list');
+
+            // Create a new product element
+            const productDiv = document.createElement('div');
+            productDiv.classList.add('product');
+            productDiv.innerHTML = `
+                <h2>${data.product.title}</h2>
+                <img src="${data.product.imageUrl}" alt="${data.product.title}">
+                <p>${data.product.description}</p>
+                <p>Price: $${data.product.price}</p>
+                <button class="add-to-cart-btn"
+                        data-id="${data.product.id}" 
+                        data-name="${data.product.title}" 
+                        data-price="${data.product.price}" 
+                        data-image="${data.product.imageUrl}"
+                        onclick="addToCart(event)">
+                    Add to Cart
+                </button>
+            `;
+
+            // Prepend the new product to the top of the product list
+            productList.prepend(productDiv);
+
+            alert('Product added successfully!');
+            window.location.href = '/products'; // Redirect to products page
+        })
+        .catch(error => alert('Error: ' + error.message));
+    });
+    </script>
+</body>
 </html>

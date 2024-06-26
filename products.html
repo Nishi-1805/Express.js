@@ -16,7 +16,7 @@
                 <li class="main-header__item"><a href="/">Home</a></li>
                 <li class="main-header__item"><a href="/courses">Courses</a></li>
                 <li class="main-header__item"><a href="/hire">Hire with Us</a></li>
-                <li class="main-header__item"><a href="/pricing">Pricing</a></li>
+                <li class="main-header__item"><a href="/add-product">Add Product</a></li>
                 <li class="main-header__item"><a href="/contact-us">Contact Us</a></li>
                 <li class="main-header__item"><a href="/products">Products</a></li>
                 <li class="main-header__item"><a href="/cart">Cart</a></li>
@@ -31,105 +31,72 @@
         </div>
     </main>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-         fetch('/api/products')
-            .then(response => response.json())
-            .then(products => {
-                const productList = document.getElementById('product-list');
-                products.forEach(product => {
-                    const productDiv = document.createElement('div');
-                    productDiv.classList.add('product');
-                    productDiv.innerHTML = `
-                        <h2>${product.name}</h2>
-                        <img src="${product.image}" alt="${product.name}">
-                        <p>${product.description}</p>
-                        <p>Price: $${product.price}</p>
-                       <button 
-                       class="add-to-cart-btn"
-                                data-id="${product.id}" 
-                                data-name="${product.name}" 
-                                data-price="${product.price}" 
-                                data-image="${product.image}"
-                                onclick="addToCart(event)"
-                            >Add to Cart</button>
-                    `;
-                    productList.appendChild(productDiv);
-                });
+          document.addEventListener('DOMContentLoaded', function () {
+            const productList = document.getElementById('product-list');
 
-                const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
-            addToCartButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const productId = this.getAttribute('data-id');
-                    const productName = this.getAttribute('data-name');
-                    const productPrice = this.getAttribute('data-price');
-                    const productImage = this.getAttribute('data-image');
-                    
-                    addToCart(productId, productName, productPrice, productImage);
-                });
-            });
-
-            const removeFromCartButtons = document.querySelectorAll('.remove-from-cart-btn');
-            removeFromCartButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const productId = this.getAttribute('data-id');
-                    removeFromCart(productId);
-                });
-            });
-            })
-            .catch(error => console.error('Error fetching products:', error));
-
-            function addToCart(productId, productName, productPrice, productImage) {   
-            fetch('/addToCart', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    productId: productId,
-                    name: productName,
-                    price: productPrice,
-                    image: productImage,
-                    qty: 1
+            fetch('/api/products')
+                .then(response => response.json())
+                .then(products => {
+                    products.forEach(product => {
+                        const productDiv = document.createElement('div');
+                        productDiv.classList.add('product');
+                        productDiv.innerHTML = `
+                            <h2>${product.title}</h2>
+                            <img src="${product.imageUrl}" alt="${product.title}" onerror="this.onerror=null; this.src='default-image.png';">
+                            <p>${product.description}</p>
+                            <p>Price: $${product.price}</p>
+                            <button class="add-to-cart-btn"
+                                    data-id="${product.id}" 
+                                    data-name="${product.title}" 
+                                    data-price="${product.price}" 
+                                    data-image="${product.imageUrl}"
+                                    onclick="addToCart(event)">
+                                Add to Cart
+                            </button>
+                        `;
+                        productList.appendChild(productDiv);
+                    });
                 })
-            })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-            }
-            throw new Error('Failed to add to cart');
-        })
-        .then(data => {
-            console.log(data.message); // or handle success as needed
-            window.location.href = '/cart';
-        })
-        .catch(error => console.error('Error adding to cart:', error));
-    }
+                .catch(error => console.error('Error fetching products:', error));
 
-function removeFromCart(productId) {
-        fetch('/remove-from-cart', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                productId: productId
-            })
-        })
-        .then(response => {
-            if (response.ok) {
-                return response.json();
+                productList.addEventListener('click', function(event) {
+        if (event.target.classList.contains('add-to-cart-btn')) {
+            addToCart(event);
+        }
+    });
+
+            function addToCart(event) {
+                const productId = event.target.getAttribute('data-id');
+                const productName = event.target.getAttribute('data-name');
+                const productPrice = event.target.getAttribute('data-price');
+                const productImage = event.target.getAttribute('data-image');
+                
+                fetch('/addToCart', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        productId: productId,
+                        name: productName,
+                        price: productPrice,
+                        image: productImage,
+                        qty: 1 // Assuming initial quantity is 1
+                    })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('Failed to add to cart');
+                })
+                .then(data => {
+                    console.log(data.message); // Log success message or handle as needed
+                    window.location.href = '/cart'; // Redirect to cart page after successful addition
+                })
+                .catch(error => console.error('Error adding to cart:', error));
             }
-            throw new Error('Failed to remove from cart');
-        })
-        .then(data => {
-            console.log(data.message); // or handle success as needed
-            alert('Product removed from cart successfully!');
-            // Reload the page to update the cart view
-            location.reload();
-        })
-        .catch(error => console.error('Error removing from cart:', error));
-    };
-        });
+                    });
     </script>
 </body>
 
