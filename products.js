@@ -1,9 +1,9 @@
 const path = require('path');
+const fs = require('fs');
 const Product = require('../models/product');
 const Cart = require('../models/cart');
 const CourseProduct = require('../models/CourseProduct');
 const Contact = require('../models/Contact');
-const db = require('../util/database');
 
 // Render the home page
 exports.getHome = (req, res, next) => {
@@ -25,96 +25,140 @@ exports.getAddProductPage = (req, res, next) => {
 };
 
 // Fetch and send all course products as JSON
+// Get product details by ID
 exports.getAllProducts = (req, res, next) => {
-    db.execute('SELECT * FROM products')
-    .then(([rows, fieldData]) => {
-        res.json(rows);
-    })
-    .catch(err => {
-        console.error('Error fetching products:', err);
-        res.status(500).json({ message: 'Error fetching products' });
-    });
+    Product.findAll()
+        .then(products => {
+            res.json(products);
+        })
+        .catch(err => {
+            console.log('Failed to retrieve products:', err);
+            res.status(500).json({ error: 'Failed to retrieve products' });
+        });
 };
 
+// Get product details by ID
+exports.getProductDetail = (req, res, next) => {
+    const productId = req.params.id;
+    Product.findByPk(productId)
+        .then(product => {
+            if (product) {
+                res.json(product);
+            } else {
+                res.status(404).json({ error: 'Product not found' });
+            }
+        })
+        .catch(err => {
+            console.log(`Failed to retrieve product with ID ${productId}:`,err);
+            res.status(500).json({ error: 'Failed to retrieve product' });
+        });
+};
 exports.getProductsPage = (req, res, next) => {
     res.sendFile(path.join(__dirname, '../views', 'products.html'));
 };
 
-exports.postAddToCart = (req, res, next) => {
-    const { productId, name, price, image, qty } = req.body;
-    CourseProduct.findProductById(productId, product => {
-        if (!product) {
-            return res.status(404).sendFile(path.join(__dirname, '../views', '404.html'));
+exports.postAddToCart = async (req, res, next) => {
+    const { productId,name, price, image,qty } = req.body;
+    
+    try {
+        const existingProduct = await Cart.findOne({ where: { productId: productId } });
+
+        if (existingProduct) {
+            // Product already exists in cart, update quantity
+            existingProduct.quantity += parseInt(qty);
+            await existingProduct.save();
+        } else {
+            // Product does not exist in cart, add new product
+            existingProduct =await Cart.create({
+                productId: productId,
+                name: name,
+                price: price,
+                image: image,
+                quantity: parseInt(qty)
+            });
         }
-        Cart.addProduct(productId, price, name, image, qty, (err) => {
-            if (err) {
-                return res.status(500).send({ message: 'Error adding product to cart' });
-            }
-            res.send({ message: 'Product added to cart successfully' });
-        });
-    });
-};
 
+        res.status(200).json({ message: 'Product added to cart successfully' });
+    } catch (err) {
+        console.error('Error adding product to cart:', err);
+        res.status(500).json({ message: 'Failed to add product to cart' });
+    }
+};
 // Handle editing a product in cart (POST)
-exports.postEditCartItem = (req, res, next) => {
-    const productId = req.body.productId;
-    const newQty = req.body.newQty;
-    db.execute('UPDATE cart SET quantity = ? WHERE product_id = ?', [newQty, productId])
-        .then(() => {
-            res.redirect('/cart');
-        })
-        .catch(err => {
-            console.error('Error editing cart item:', err);
-            res.status(500).send('Internal Server Error');
-    });
+exports.postEditCartItem = async (req, res, next) => {
+    const { productId, newQty } = req.body;
+
+    try {
+        const cartItem = await Cart.findOne({ where: { productId: productId } });
+
+        if (!cartItem) {
+            return res.status(404).json({ message: 'Product not found in cart' });
+        }
+
+        cartItem.quantity = parseInt(newQty);
+        await cartItem.save();
+
+        res.json({ message: 'Cart item updated successfully' });
+    } catch (err) {
+        console.error('Error updating cart item:', err);
+        res.status(500).json({ message: 'Failed to update cart item' });
+    }
 };
 
-// Remove product from cart
-exports.postRemoveFromCart = (req, res, next) => {
+// Handle removing a product from cart
+exports.postRemoveFromCart = async (req, res, next) => {
     const { productId } = req.body;
 
-    if (!productId) {
-        return res.status(400).json({ message: 'ProductId is required' });
-    }
+    try {
+        const cartItem = await Cart.findOne({ where: { productId: productId } });
 
-    Cart.deleteProduct(productId, (err) => {
-        if (err) {
-            console.error('Error removing from cart:', err);
-            return res.status(500).send('Internal Server Error');
+        if (!cartItem) {
+            return res.status(404).json({ message: 'Product not found in cart' });
         }
-        res.redirect('/cart'); // Redirect to cart page after successful deletion
-    });
+
+        await cartItem.destroy();
+        res.json({ message: 'Product removed from cart successfully' });
+    } catch (err) {
+        console.error('Error removing from cart:', err);
+        res.status(500).json({ message: 'Failed to remove product from cart' });
+    }
 };
 
-// Display cart
-exports.getCart = (req, res, next) => {
-    Cart.getCart(cart => {
-        res.json(cart);
-    });
-};
+// Fetch all cart items and calculate total price
+exports.getCart = async (req, res, next) => {
+    try {
+        const cartItems = await Cart.findAll();
+        const totalPrice = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
+        res.json({ products: cartItems, totalPrice: totalPrice });
+    } catch (err) {
+        console.error('Error fetching cart data:', err);
+        res.status(500).json({ message: 'Failed to retrieve cart data' });
+    }
+};
 // Render cart page
 exports.getCartPage = (req, res, next) => {
     res.sendFile(path.join(__dirname, '../views', 'cart.html'));
 };
 
 // Handle adding a product (POST)
-exports.postAddProduct = (req, res, next) => {
+exports.postAddProduct = async (req, res, next) => {
     const { name, email, phone, date, time } = req.body;
-    
-    if (!name || !email || !phone || !date || !time) {
-        return res.status(400).send('All fields are required');
-    }
 
-    const contact = new Contact(name, email, phone, date, time);
-    contact.save((err) => {
-        if (err) {
-            console.error('Error saving contact:', err);
-            res.status(500).send('Error saving contact');
-        } else {
-            res.redirect('/success');
-        }
-    });
+    try {
+        const newContact = await Contact.create({
+            name: name,
+            email: email,
+            phone: phone,
+            time: time,
+            date: date,
+        });
+
+        res.redirect('/success'); 
+    } catch (err) {
+        console.error('Error saving contact:', err);
+        res.status(500).json({ message: 'Failed to save contact' });
+    }
 };
 // Render the success page
 exports.getSuccess = (req, res, next) => {
@@ -128,48 +172,33 @@ exports.get404 = (req, res, next) => {
 
 // Fetch all products and render courses page
 exports.getCourses = (req, res, next) => {
-    CourseProduct.fetchProducts((products) => {
+    CourseProduct.fetchProducts()
+    .then(products => {
         res.sendFile(path.join(__dirname, '../views', 'courses.html'));
-    });
-};
-
-// Get product details by ID
-exports.getProductDetail = (req, res, next) => {
-    const productId = req.params.productId;
-    CourseProduct.findProductById(productId, (product) => {
-        if (product) {
-            res.json(product);  // For now, just send the product details in response
-        } else {
-            res.status(404).send('Product not found');
-        }
+    })
+    .catch(err => {
+        console.error('Error fetching course products:', err);
+        res.status(500).json({ error: 'Failed to retrieve course products' });
     });
 };
 
 exports.AddNewProduct = (req, res, next) => {
     console.log(req.body);
-    const { id, title, price, imageUrl, description } = req.body;
+    const {id, title, price, imageUrl, description } = req.body;
 
-    if (!title || !price || !imageUrl || !description) {
-        return res.status(400).json({ message: 'All fields are required' });
-    }
-    const idValue = id ? id : null;
-    console.log('Inserting product with values:', { idValue, title, price, imageUrl, description });
-    db.execute('INSERT INTO products (id, title, price, imageUrl, description) VALUES (?, ?, ?, ?, ?)', 
-        [idValue, title, price, imageUrl, description])
-        .then(result => {
-            const productId = result[0].insertId;
-            console.log('Product inserted with ID:', productId);
-            // Fetch the newly added product from the database to send back to client
-           return db.execute('SELECT * FROM products WHERE id = ?', [productId])
-           })
-           .then(([product]) => {
-            if (product.length === 0) {
-                throw new Error('Product not found');
-            }
-            res.status(201).json({ message: 'Product added successfully', product: product[0] });
-        })
-        .catch(err => {
-            console.error('Error fetching newly added product:', err);
-            res.status(500).json({ message: 'Failed to add product' });
-        });
+   Product.create({
+    id:id,
+    title:title,
+    price:price,
+    imageUrl:imageUrl,
+    description:description
+   })
+   .then(result => {
+    console.log('Product created successfully:', result);
+    res.redirect('/'); // Redirect to home or products page after successful creation
+})
+.catch(err => {
+    console.error('Error creating product:', err);
+    res.status(500).send('Internal Server Error');
+});
 };

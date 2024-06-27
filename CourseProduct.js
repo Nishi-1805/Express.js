@@ -1,30 +1,51 @@
-const path = require('path');
-const fs = require('fs');
+const {Sequelize, DataTypes } = require('sequelize');
+const sequelize = require('../util/database');
 
-const filePath = path.join(__dirname, '../data', 'courseProducts.json');
+// Define the CourseProduct model
+const CourseProduct = sequelize.define('CourseProduct', {
+    id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        allowNull: false,
+        primaryKey: true
+    },
+    title: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    description: {
+        type: DataTypes.TEXT,
+        allowNull: false
+    },
+    duration: {
+        type: DataTypes.STRING, // Adjust the data type as per your needs
+        allowNull: false
+    },
+    image: {
+        type: DataTypes.STRING,
+        allowNull: true // Assuming image is optional
+    }
+});
 
-const getProductsFromFile = (cb) => {
-    fs.readFile(filePath, 'utf-8', (err, fileContent) => {
-        if (err) {
-            cb([]);
-        } else {
-            try {
-                cb(JSON.parse(fileContent));
-            } catch (parseErr) {
-                cb([]);
-            }
-        }
-    });
+// Example of additional methods for CourseProduct
+CourseProduct.fetchProducts = async () => {
+    try {
+        const products = await CourseProduct.findAll();
+        return products;
+    } catch (err) {
+        console.error('Error fetching course products:', err);
+        return [];
+    }
 };
 
-module.exports = class CourseProduct {
-    static fetchProducts(cb) {
-        getProductsFromFile(cb);
-    }
-    static findProductById(id, cb) {
-        getProductsFromFile((products) => {
-            const product = products.find(prod => prod.id === parseInt(id)); // Ensure ID comparison is correct
-            cb(product);
-        });
+CourseProduct.findProductById = async (id) => {
+    try {
+        const product = await CourseProduct.findByPk(id);
+        return product;
+    } catch (err) {
+        console.error(`Error finding course product with ID ${id}:`, err);
+        return null;
     }
 };
+
+module.exports = CourseProduct;

@@ -1,24 +1,33 @@
-const db = require('../util/database');
+const { Sequelize, DataTypes } = require('sequelize');
+const sequelize = require('../util/database');
 
-module.exports = class Contact {
-    constructor(name, email, phone, date, time) {
-        this.name = name;
-        this.email = email;
-        this.phone = phone;
-        this.date = date;
-        this.time = time;
+const Contact = sequelize.define('Contact', {
+    id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        allowNull: false,
+        primaryKey: true
+    },
+    name: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    email: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    phone: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    date: {
+        type: DataTypes.DATEONLY,
+        allowNull: false
+    },
+    time: {
+        type: DataTypes.TIME,
+        allowNull: false
     }
+});
 
-    async save(cb) {
-        try {
-            const result = await db.execute(
-                'INSERT INTO contact (name, email, phone, date, time) VALUES (?, ?, ?, ?, ?)',
-                [this.name, this.email, this.phone, this.date, this.time]
-            );
-            cb(null, result);
-        } catch (err) {
-            console.error('Error saving contact:', err);
-            cb(err);
-        }
-    }
-};
+module.exports = Contact;

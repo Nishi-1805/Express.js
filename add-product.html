@@ -13,7 +13,7 @@
                 <li class="main-header__item"><a href="/">Home</a></li>
                 <li class="main-header__item"><a href="/courses">Courses</a></li>
                 <li class="main-header__item"><a href="/hire">Hire with Us</a></li>
-                <li class="main-header__item"><a class="active" href="/add-product">Add Product</a></li>
+                <li class="main-header__item"><a class="active" href="/admin/add-product">Add Product</a></li>
                 <li class="main-header__item"><a href="/contact-us">Contact Us</a></li>
                 <li class="main-header__item"><a href="/products">Products</a></li>
                 <li class="main-header__item"><a href="/cart">Cart</a></li>
@@ -22,7 +22,7 @@
     </header>
     <main class="centered">
     <h1>Add New Product</h1>
-    <form id="add-product-form" action="/add-product" method="POST">
+    <form id="add-product-form" action="/admin/add-product" method="POST">
         <label for="productId">Product ID:</label>
         <input type="number" id="productId" name="id" required>
         <br>
@@ -55,7 +55,7 @@
                 description: formData.get('description')
             };
 
-            fetch('/add-product', {
+            fetch('/admin/add-product', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

@@ -49,8 +49,8 @@
                                 <img src="${product.image}" alt="${product.name}">
                                 <p>Quantity: ${product.quantity}</p>
                                 <p>Price: $${product.price}</p>
-                                 <button class="edit-cart-btn" data-id="${product.product_id}" onclick="editCartItem(event)">Edit</button>
-                                <button class="delete-cart-btn" data-id="${product.product_id}" onclick="removeFromCart(event)">Delete</button>
+                                 <button class="edit-cart-btn" data-id="${product.productId}" onclick="editCartItem(event)">Edit</button>
+                                <button class="delete-cart-btn" data-id="${product.productId}" onclick="removeFromCart(event)">Delete</button>
                             `;
                             cartList.appendChild(cartItem);
                         });
