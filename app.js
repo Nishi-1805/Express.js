@@ -9,6 +9,9 @@ const shopRoutes = require('./routes/shop');
 const successRoutes = require('./routes/success');
 const cartRoutes = require('./routes/cart'); 
 
+const Product = require('./models/product');
+const User = require('./models/user');
+
 const app = express();
 app.use(bodyParser.json());
 
@@ -22,11 +25,21 @@ app.use('/cart' ,cartRoutes);
 
 // Error handling middleware
 app.use(errorController.get404);
+Product.belongsTo(User, {constraints: true, onDelete: 'CASCADE'});
+User.hasMany(Product);
 
 sequelize
 .sync()
 .then(result => {
-    console.log('Database synced!');
+  return User.findByPk(1);
+})
+.then(user=>{
+    if(!user){
+        return User.create({name: 'FangLeng', email: 'fang@gmail.com'})
+    }
+    return user;
+})
+.then(user=>{
     app.listen(7000, () => {
         console.log('Server is running on port 7000');
     });
