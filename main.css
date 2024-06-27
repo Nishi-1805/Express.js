@@ -1,174 +1,82 @@
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-image: url('https://en.idei.club/uploads/posts/2023-06/1686787518_en-idei-club-p-portfolio-background-dizain-krasivo-1.jpg');
-}
-
-.main-header {
-    background-color: #333;
-    color: #fff;
-    padding: 10px;
-}
-
-.main-header__nav {
+    background-color: #87ceeb; /* Sky blue background */
     display: flex;
     justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Ensure minimum height to cover viewport */
 }
 
-.main-header__item-list {
-    list-style: none;
+.container {
     display: flex;
-    margin: 0;
-    padding: 0;
-    gap: 1em;
-
+    flex-direction: column;
+    align-items: center;
+    width: 80%; /* Center the content and limit width */
+    max-width: 800px; /* Limit maximum width for better readability */
+    background-color: #fff; /* Baby pink background for form */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.main-header__item {
-    margin: 0 10px;
+.form-container {
+    width: 100%; /* Take full width inside .container */
 }
 
-.main-header__item a {
-    color: #fff;
-    text-decoration: none;
-    padding: 5px 10px;
+.appointments-container {
+    width: 100%; /* Take full width inside .container */
+    background-color: #f0f0f0; /* Light gray background for appointments */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px; /* Add space between form and appointments */
 }
 
-.main-header__item a.active {
-    background-color: #555;
-    border-radius: 3px;
-}
-
-.centered {
-    width: 60%;
-    margin: auto;
+h1, h2 {
     text-align: center;
+    margin-bottom: 10px; /* Ensure space between headings and content */
 }
 
-.contact-form {
-    width: 300px;
-    margin: auto;
+form {
+    width: 100%;
+    max-width: 500px; /* Limit width of the form for better readability */
 }
 
-.form-control {
-    margin-bottom: 10px;
-}
-
-.form-control label {
+label {
     display: block;
     margin-bottom: 5px;
 }
 
-.form-control input[type="text"],
-.form-control input[type="email"],
-.form-control input[type="tel"] {
-    width: calc(100% - 20px);
-    padding: 8px;
+input[type="text"],
+input[type="tel"],
+input[type="email"],
+button {
+    width: calc(100% - 22px); /* Adjust width for input fields and buttons */
+    padding: 12px; /* Increase padding for better touch targets */
+    margin-bottom: 10px;
     border: 1px solid #ccc;
-    border-radius: 3px;
-    font-size: 14px;
+    border-radius: 6px;
+    box-sizing: border-box;
 }
 
 button {
-    background-color: #333;
+    background-color: #4caf50; /* Green button */
     color: #fff;
     border: none;
-    padding: 10px 20px;
-    border-radius: 3px;
     cursor: pointer;
 }
 
 button:hover {
-    background-color: #555;
+    background-color: #45a049; /* Darker green on hover */
 }
 
-#product-list {
-    display: flex;
-    justify-content: space-around; /* Adjust as per your preference */
-    flex-wrap: wrap; /* Wrap products to next line when space is limited */
-    gap: 20px; /* Adjust spacing between products */
-}
-
-.product {
-    background: #fff;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 10px;
-    width: 45%; /* Adjust width based on your design */
-    box-sizing: border-box; /* Include padding and border in width calculation */
-}
-
-.product img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 5px; /* Optional: Add rounded corners to images */
-}
-
-.cart-list {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    gap: 20px;
-    padding: 0;
-    list-style-type: none;
-}
-
-.cart-item {
-    background: #fff;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 10px;
-    width: 45%; /* Same width as product items */
-    box-sizing: border-box;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+#message {
     text-align: center;
+    margin-top: 10px;
 }
-
-.cart-item img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 5px;
-}
-
-form#add-product-form {
+.button-group {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    background: rgba(200, 200, 200, 0.7);
-    padding: 20px;
-    border-radius: 8px;
-    
+    justify-content: flex-end; /* Align buttons to the right */
 }
-
-form#add-product-form label {
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-form#add-product-form input[type="text"],
-form#add-product-form input[type="number"] {
-    width: 100%;
-    max-width: 400px;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 16px;
-}
-
-form#add-product-form button {
-    width: 100%;
-    max-width: 200px;
-    padding: 10px;
-    background-color: #333;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-form#add-product-form button:hover {
-    background-color: #555;
+.edit-button, .delete-button {
+    margin-left: 10px; /* Add space between buttons */
 }
