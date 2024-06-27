@@ -16,7 +16,7 @@
                 <li class="main-header__item"><a href="/">Home</a></li>
                 <li class="main-header__item"><a href="/courses">Courses</a></li>
                 <li class="main-header__item"><a href="/hire">Hire with Us</a></li>
-                <li class="main-header__item"><a href="/pricing">Pricing</a></li>
+                <li class="main-header__item"><a href="/add-product">Add Product</a></li>
                 <li class="main-header__item"><a href="/contact-us">Contact Us</a></li>
                 <li class="main-header__item"><a href="/products">Products</a></li>
                 <li class="main-header__item"><a href="/cart">Cart</a></li>
@@ -47,10 +47,10 @@
                             cartItem.innerHTML = `
                                 <h2>${product.name}</h2>
                                 <img src="${product.image}" alt="${product.name}">
-                                <p>Quantity: ${product.qty}</p>
+                                <p>Quantity: ${product.quantity}</p>
                                 <p>Price: $${product.price}</p>
-                                 <button class="edit-cart-btn" data-id="${product.id}" onclick="editCartItem(event)">Edit</button>
-                                <button onclick="removeFromCart('${product.id}', '${product.price}')">Delete</button>
+                                 <button class="edit-cart-btn" data-id="${product.product_id}" onclick="editCartItem(event)">Edit</button>
+                                <button class="delete-cart-btn" data-id="${product.product_id}" onclick="removeFromCart(event)">Delete</button>
                             `;
                             cartList.appendChild(cartItem);
                         });
@@ -60,26 +60,28 @@
             }
 
             // Function to remove item from cart
-            window.removeFromCart = function (productId, productPrice) {
+            function removeFromCart(event) {
+                const productId = event.target.getAttribute('data-id');
                 fetch('/remove-from-cart', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({
-                        productId: productId,
-                        productPrice: productPrice
-                    })
+                    body: JSON.stringify({ productId: productId,})
                 })
                     .then(response => {
                         if (response.ok) {
-                            loadCart(); // Reload cart data to reflect changes
-                        } else {
-                            throw new Error('Failed to remove from cart');
-                        }
-                    })
-                    .catch(error => console.error('Error removing from cart:', error));
-            };
+                            return response.json();
+            }
+            throw new Error('Failed to remove from cart');
+        })
+        .then(data => {
+            console.log(data.message); // Log success message or handle as needed
+            loadCart(); // Reload cart data to reflect changes
+        })
+        .catch(error => console.error('Error removing from cart:', error));
+    };
+    window.removeFromCart = removeFromCart;
  // Function to edit item quantity in cart
  function editCartItem(event) {
                 const productId = event.target.getAttribute('data-id');
@@ -106,6 +108,7 @@
                     .catch(error => console.error('Error editing cart item:', error));
                 }
             }
+            window.editCartItem = editCartItem;
             // Load cart data on page load
             loadCart();
         });

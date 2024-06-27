@@ -2,38 +2,27 @@ const express = require('express');
 const router = express.Router();
 const productsController = require('../controllers/products');
 
+// Home and general routes
 router.get('/', productsController.getHome);
-
 router.get('/courses', productsController.getCourses);
-
 router.get('/hire', productsController.redirectHome);
 
-router.get('/pricing', productsController.redirectHome);
-
 router.get('/contact-us', productsController.getContactUs);
-
 router.post('/contact-us', productsController.postAddProduct);
-
 router.get('/success', productsController.getSuccess);
 
-router.get('/api/products', productsController.getAllProducts);
+// Product-related routes
+router.get('/api/products', productsController.getAllProducts); // API endpoint for all products
+router.get('/products/:productId', productsController.getProductDetail); // Single product detail
+router.get('/products', productsController.getProductsPage); // Products page
 
-//router.post('/cart', productsController.postAddToCart); // Adds a product to the cart
 
-router.get('/products/:productId', productsController.getProductDetail);
-
-router.post('/edit-cart', productsController.postEditCartItem);
-
-router.post('/addToCart', productsController.postAddToCart); // This might be redundant with /cart
-
-router.post('/remove-from-cart', productsController.postRemoveFromCart);
-
-router.get('/cart-data', productsController.getCart); // Serves cart data for API requests
-
-router.get('/cart', productsController.getCartPage); // Serves the cart page
-
-router.get('/products/data', productsController.getAllProducts);
-
-router.get('/products', productsController.getProductsPage);
+// Cart-related routes
+router.post('/addToCart', productsController.postAddToCart); // Add product to cart
+router.post('/edit-cart-item', productsController.postEditCartItem); // Edit cart item
+router.post('/remove-from-cart', productsController.postRemoveFromCart); // Remove from cart
+router.get('/cart-data', productsController.getCart); // API endpoint for cart data
+router.get('/cart', productsController.getCartPage); // Cart page
 
 module.exports = router;
+

@@ -2,16 +2,10 @@ const express = require('express');
 const router = express.Router();
 const productsController = require('../controllers/products');
 
-router.get('/dashboard', (req, res) => {
-    res.send('Admin Dashboard');
-});
-
 router.get('/add-product', (req, res) => {
-    res.send('Admin Add Product Page');
+    res.sendFile(path.join(__dirname, '../views', 'add-product.html'));
 });
-
-router.post('/add-product', productsController.postAddProduct);
-
-
+router.post('/add-product', productsController.AddNewProduct);
+router.get('/add-product', productsController.getAddProductPage);
 module.exports = router;
 
