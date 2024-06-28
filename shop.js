@@ -24,5 +24,7 @@ router.post('/remove-from-cart', productsController.postRemoveFromCart); // Remo
 router.get('/cart-data', productsController.getCart); // API endpoint for cart data
 router.get('/cart', productsController.getCartPage); // Cart page
 
+router.get('/products/:userId', productsController.getProductsByUser);
+
 module.exports = router;
 
