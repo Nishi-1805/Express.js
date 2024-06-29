@@ -13,7 +13,7 @@
                 <li class="main-header__item"><a href="/">Home</a></li>
                 <li class="main-header__item"><a href="/courses">Courses</a></li>
                 <li class="main-header__item"><a href="/hire">Hire with Us</a></li>
-                <li class="main-header__item"><a class="active" href="/add-product">Add Product</a></li>
+                <li class="main-header__item"><a class="active" href="/admin/add-product">Add Product</a></li>
                 <li class="main-header__item"><a href="/contact-us">Contact Us</a></li>
                 <li class="main-header__item"><a href="/products">Products</a></li>
                 <li class="main-header__item"><a href="/cart">Cart</a></li>
@@ -22,7 +22,7 @@
     </header>
     <main class="centered">
     <h1>Add New Product</h1>
-    <form id="add-product-form" action="/add-product" method="POST">
+    <form id="add-product-form" action="/admin/add-product" method="POST">
         <label for="productId">Product ID:</label>
         <input type="number" id="productId" name="id" required>
         <br>
@@ -44,7 +44,7 @@
     </main>
     <script>
         document.getElementById('add-product-form').addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent the default form submission
+            event.preventDefault(); 
 
             const formData = new FormData(event.target);
             const data = {
@@ -55,7 +55,7 @@
                 description: formData.get('description')
             };
 
-            fetch('/add-product', {
+            fetch('/admin/add-product', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -64,15 +64,12 @@
             })
             .then(response => {
             if (response.ok) {
-                return response.json(); // Parse response JSON
+                return response.json();
             }
-            throw new Error('Failed to add product');
         })
         .then(data => {
-            // Assuming productList is the container where products are displayed
             const productList = document.getElementById('product-list');
 
-            // Create a new product element
             const productDiv = document.createElement('div');
             productDiv.classList.add('product');
             productDiv.innerHTML = `
@@ -89,12 +86,10 @@
                     Add to Cart
                 </button>
             `;
-
-            // Prepend the new product to the top of the product list
             productList.prepend(productDiv);
 
             alert('Product added successfully!');
-            window.location.href = '/products'; // Redirect to products page
+            window.location.href = '/products'; 
         })
         .catch(error => alert('Error: ' + error.message));
     });

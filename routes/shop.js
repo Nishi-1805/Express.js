@@ -12,17 +12,17 @@ router.post('/contact-us', productsController.postAddProduct);
 router.get('/success', productsController.getSuccess);
 
 // Product-related routes
-router.get('/api/products', productsController.getAllProducts); // API endpoint for all products
-router.get('/products/:productId', productsController.getProductDetail); // Single product detail
-router.get('/products', productsController.getProductsPage); // Products page
+router.get('/api/products', productsController.getAllProducts); 
+router.get('/products/:id', productsController.getProductDetail);
+router.get('/products', productsController.getProductsPage); 
 
 
 // Cart-related routes
-router.post('/addToCart', productsController.postAddToCart); // Add product to cart
-router.post('/edit-cart-item', productsController.postEditCartItem); // Edit cart item
-router.post('/remove-from-cart', productsController.postRemoveFromCart); // Remove from cart
-router.get('/cart-data', productsController.getCart); // API endpoint for cart data
-router.get('/cart', productsController.getCartPage); // Cart page
+router.post('/addToCart', productsController.postAddToCart); 
+router.post('/edit-cart-item', productsController.postEditCartItem); 
+router.post('/remove-from-cart', productsController.postRemoveFromCart);
+router.get('/cart-data', productsController.getCart); 
+router.get('/cart', productsController.getCartPage); 
 
 module.exports = router;
 

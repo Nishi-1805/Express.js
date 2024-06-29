@@ -1,53 +1,83 @@
 const express = require('express');
 const router = express.Router();
 const Cart = require('../models/cart');
-const db = require('../util/database');
+const Product = require('../models/product');
 
-// Add to Cart
-router.post('/addToCart', (req, res) => {
-    const { productId, name, price, image, qty } = req.body;
+router.post('/addToCart', async (req, res) => {
+    try {
+        const { productId, quantity } = req.body;
+        const product = await Product.findByPk(productId);
 
-    Cart.addProduct(productId, price, name, image, qty, (err) => {
-        if (err) {
-            return res.status(500).send({ message: 'Error adding product to cart' });
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
         }
-        res.send({ message: 'Product added to cart successfully' });
-    });
-});
+        let cartProduct = await Cart.findOne({ where: { productId } });
 
-// Fetch Cart Data
-router.get('/cart-data', (req, res) => {
-    Cart.getCart((cart) => {
-        res.json(cart);
-    });
-});
-
-// Edit Cart Item
-router.post('/edit-cart-item', (req, res) => {
-    const { productId, qty } = req.body;
-
-    Cart.updateProductQty(productId, qty, (err) => {
-        if (err) {
-            return res.status(500).send({ message: 'Error updating cart item' });
+        if (cartProduct) {
+            cartProduct.quantity += parseInt(quantity);
+            await cartProduct.save();
+        } else {
+            cartProduct = await Cart.create({
+                productId: product.id,
+                name: product.title,
+                price: product.price,
+                image: product.imageUrl,
+                quantity: parseInt(quantity)
+            });
         }
-        res.send({ message: 'Cart updated successfully' });
-    });
-});
 
-// Remove from Cart
-router.post('/remove-from-cart', (req, res) => {
+        res.status(200).json({ message: 'Product added to cart successfully' });
+    } catch (error) {
+        console.error('Error adding to cart:', error);
+        res.status(500).json({ message: 'Failed to add to cart' });
+    }
+});
+router.get('/cart-data', async (req, res) => {
+    try {
+        const cartItems = await Cart.findAll();
+        const totalPrice = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+        res.json({ products: cartItems, totalPrice: totalPrice });
+    } catch (err) {
+        console.error('Error fetching cart data:', err);
+        res.status(500).json({ message: 'Failed to retrieve cart data' });
+    }
+});
+router.post('/edit-cart-item', async (req, res) => {
+    const { productId, newQty } = req.body;
+
+    try {
+        const cartItem = await Cart.findOne({ where: { productId: productId } });
+
+        if (!cartItem) {
+            return res.status(404).json({ message: 'Product not found in cart' });
+        }
+
+        cartItem.quantity = parseInt(newQty);
+        await cartItem.save();
+
+        res.json({ message: 'Cart item updated successfully' });
+    } catch (err) {
+        console.error('Error updating cart item:', err);
+        res.status(500).json({ message: 'Failed to update cart item' });
+    }
+});
+router.post('/remove-from-cart', async (req, res) => {
     const { productId } = req.body;
 
-    if (!productId) {
-        return res.status(400).json({ message: 'ProductId is required' });
-    }
+    try {
+        const cartItem = await Cart.findOne({ where: { productId: productId } });
 
-    Cart.deleteProduct(productId, (err) => {
-        if (err) {
-            console.error('Error removing from cart:', err);
-            return res.status(500).json({ message: 'Failed to remove product from cart' });
+        if (!cartItem) {
+            return res.status(404).json({ message: 'Product not found in cart' });
         }
-        res.status(200).json({ message: 'Product removed from cart successfully' });
-    });
+
+        await cartItem.destroy();
+        res.json({ message: 'Product removed from cart successfully' });
+    } catch (err) {
+        console.error('Error removing from cart:', err);
+        res.status(500).json({ message: 'Failed to remove product from cart' });
+    }
 });
+
 module.exports = router;

@@ -30,11 +30,10 @@
         <ul class="cart-list" id="cart-list">
             <!-- Cart items will be populated here by JavaScript -->
         </ul>
-        <p id="total-price">Total Price: $0</p>
+        <h3  id="total-price"><strong>Total Price: $0</strong></h3>
     </main>
     <script>
        document.addEventListener('DOMContentLoaded', function () {
-            // Function to load cart data
             function loadCart() {
                 fetch('/cart-data')
                     .then(response => response.json())
@@ -49,8 +48,8 @@
                                 <img src="${product.image}" alt="${product.name}">
                                 <p>Quantity: ${product.quantity}</p>
                                 <p>Price: $${product.price}</p>
-                                 <button class="edit-cart-btn" data-id="${product.product_id}" onclick="editCartItem(event)">Edit</button>
-                                <button class="delete-cart-btn" data-id="${product.product_id}" onclick="removeFromCart(event)">Delete</button>
+                                 <button class="edit-cart-btn" data-id="${product.productId}" onclick="editCartItem(event)">Edit</button>
+                                <button class="delete-cart-btn" data-id="${product.productId}" onclick="removeFromCart(event)">Delete</button>
                             `;
                             cartList.appendChild(cartItem);
                         });
@@ -58,8 +57,6 @@
                     })
                     .catch(error => console.error('Error fetching cart data:', error));
             }
-
-            // Function to remove item from cart
             function removeFromCart(event) {
                 const productId = event.target.getAttribute('data-id');
                 fetch('/remove-from-cart', {
@@ -76,13 +73,12 @@
             throw new Error('Failed to remove from cart');
         })
         .then(data => {
-            console.log(data.message); // Log success message or handle as needed
-            loadCart(); // Reload cart data to reflect changes
+            console.log(data.message); 
+            loadCart(); 
         })
         .catch(error => console.error('Error removing from cart:', error));
     };
     window.removeFromCart = removeFromCart;
- // Function to edit item quantity in cart
  function editCartItem(event) {
                 const productId = event.target.getAttribute('data-id');
                 const newQty = prompt('Enter new quantity:');
@@ -100,7 +96,7 @@
                     })
                     .then(response => {
                         if (response.ok) {
-                            loadCart(); // Reload cart data to reflect changes
+                            loadCart(); 
                         } else {
                             throw new Error('Failed to edit cart item');
                         }
@@ -109,7 +105,6 @@
                 }
             }
             window.editCartItem = editCartItem;
-            // Load cart data on page load
             loadCart();
         });
     </script>

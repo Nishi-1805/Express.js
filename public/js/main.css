@@ -1,0 +1,82 @@
+body {
+    background-color: #87ceeb; /* Sky blue background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Ensure minimum height to cover viewport */
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 80%; /* Center the content and limit width */
+    max-width: 800px; /* Limit maximum width for better readability */
+    background-color: #fff; /* Baby pink background for form */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-container {
+    width: 100%; /* Take full width inside .container */
+}
+
+.appointments-container {
+    width: 100%; /* Take full width inside .container */
+    background-color: #f0f0f0; /* Light gray background for appointments */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px; /* Add space between form and appointments */
+}
+
+h1, h2 {
+    text-align: center;
+    margin-bottom: 10px; /* Ensure space between headings and content */
+}
+
+form {
+    width: 100%;
+    max-width: 500px; /* Limit width of the form for better readability */
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+input[type="text"],
+input[type="tel"],
+input[type="email"],
+button {
+    width: calc(100% - 22px); /* Adjust width for input fields and buttons */
+    padding: 12px; /* Increase padding for better touch targets */
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+button {
+    background-color: #4caf50; /* Green button */
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+#message {
+    text-align: center;
+    margin-top: 10px;
+}
+.button-group {
+    display: flex;
+    justify-content: flex-end; /* Align buttons to the right */
+}
+.edit-button, .delete-button {
+    margin-left: 10px; /* Add space between buttons */
+}
