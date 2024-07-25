@@ -1,34 +1,45 @@
 const express = require('express');
-const fs = require('fs').promises;
+const bodyParser = require('body-parser');
+const fs = require('fs');
 const path = require('path');
 
 const app = express();
-const PORT = 3000;
 
 app.use(express.json());
 
 let messages = [];
 
 app.post('/send-message', (req, res) => {
-    const { username, message } = req.body;
-    messages.push({ username, message });
+    const username = req.body.username;
+    const message = req.body.message;
 
-    fs.writeFile(path.join(__dirname, 'messages.json'), JSON.stringify(messages, null, 2))
-        .then(() => {
-            console.log('Message stored successfully');
-            res.json({ success: true });
-        })
-        .catch(error => {
-            console.error('Error storing message:', error);
-            res.status(500).json({ error: 'Error storing message' });
-        });
+    if (username && message) {
+        messages.push({ username, message });
+        fs.promises.writeFile(path.join(__dirname, 'messages.json'), JSON.stringify(messages, null, 2))
+            .then(() => {
+                res.json({ success: true });
+            })
+            .catch(error => {
+                console.error('Error writing messages:', error);
+                res.status(500).json({ error: 'Error writing messages' });
+            });
+    } else {
+        res.status(400).json({ error: 'Username or message is missing' });
+    }
 });
 
 app.get('/messages', (req, res) => {
-   
-    fs.readFile(path.join(__dirname, 'messages.json'), 'utf8')
+    fs.promises.readFile(path.join(__dirname, 'messages.json'), 'utf8')
         .then(data => {
-            messages = JSON.parse(data);
+            if (data.trim() === '') {
+                data = '[]'; // Initialize with an empty array if file is empty
+            }
+            try {
+                messages = JSON.parse(data) || [];
+            } catch (error) {
+                console.error('Error parsing JSON:', error);
+                messages = [];
+            }
             res.json(messages);
         })
         .catch(error => {
@@ -37,14 +48,14 @@ app.get('/messages', (req, res) => {
         });
 });
 
-app.get('/login', (req, res) => {
+app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'login.html'));
 });
 
-app.get('/', (req, res) => {
+app.get('/chat', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+app.listen(3000, () => {
+    console.log(`Server is running on http://localhost:3000`);
 });

@@ -6,20 +6,27 @@
     <title>Login</title>
 </head>
 <body>
-    <h1>Login</h1>
     <form id="loginForm">
-    <label for="username">Username:</label>
-    <input type="text" name="username" id="username" required>
-    <button type="submit">Login</button>
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+        <button type="submit">Login</button>
     </form>
-<script>
-   document.getElementById('loginForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const username = document.getElementById('username').value;
-            localStorage.setItem('username', JSON.stringify(username));
-            console.log('Username stored in local storage:', localStorage.getItem('username'));
-            window.location.href = '/';
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('loginForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                const username = document.getElementById('username').value.trim();
+
+                if (username) {
+                    localStorage.setItem('username', username);
+                    console.log('Username set in localStorage:', localStorage.getItem('username'));
+                    window.location.href = '/chat';
+                } else {
+                    alert('Please enter a username!');
+                }
+            });
         });
-</script>
+    </script>
 </body>
 </html>
